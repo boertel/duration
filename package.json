@@ -5,7 +5,7 @@
     "estrella": "^1.4.1"
   },
   "name": "@boertel/duration",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "test": "echo \"Error: no test specified\""
   },
