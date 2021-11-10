@@ -1,0 +1,23 @@
+{
+  "main": "./dist/duration.umd.js",
+  "module": "./dist/duration.es.js",
+  "devDependencies": {
+    "estrella": "^1.4.1"
+  },
+  "name": "@boertel/duration",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boertel/duration.git"
+  },
+  "author": "boertel",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/boertel/duration/issues"
+  },
+  "homepage": "https://github.com/boertel/duration#readme",
+  "description": ""
+}
