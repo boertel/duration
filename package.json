@@ -1,6 +1,6 @@
 {
   "name": "@boertel/duration",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "./dist/duration.umd.js",
   "module": "./dist/duration.es.js",
   "types": "./dist/duration.d.ts",
@@ -14,7 +14,7 @@
     "dev": "./build.js -debug -watch -inline-sourcemap",
     "build": "./build.js",
     "test": "echo \"Error: no test specified\"",
-     "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
