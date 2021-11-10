@@ -1,80 +1,86 @@
 export function duration(seconds) {
-  let output = []
-  let remainder = seconds
+  let output = [];
+  let remainder = seconds;
   const durations = [
     // Number of seconds in
     24 * 60 * 60, // a day
     60 * 60, // a hour
     1 * 60, // a minute
-  ]
+  ];
   durations.forEach((divisor, index) => {
-    const quotient: number = Math.abs(parseInt(`${remainder / divisor}`, 10))
-    remainder = Math.abs(remainder % divisor)
-    output.push(Math.floor(quotient))
+    const quotient: number = Math.abs(parseInt(`${remainder / divisor}`, 10));
+    remainder = Math.abs(remainder % divisor);
+    output.push(Math.floor(quotient));
     if (index === durations.length - 1) {
-      output.push(Math.floor(remainder))
+      output.push(Math.floor(remainder));
     }
-  })
-  return output.reverse()
+  });
+  return output.reverse();
 }
 
 function pad(value) {
-  let s = String(value)
+  let s = String(value);
   while (s.length < 2) {
-    s = '0' + s
+    s = "0" + s;
   }
-  return s
+  return s;
 }
 
-const defaultFormat = (value, key) => `${value} ${value === 1 ? key : `${key}s`}`
+const defaultFormat = (value, key) =>
+  `${value} ${value === 1 ? key : `${key}s`}`;
 const defaultSeparator = (index, length) => {
   if (index === 0) {
-    return ''
+    return "";
   }
   if (index === length - 1) {
-    return ' and '
+    return " and ";
   } else {
-    return ', '
+    return ", ";
   }
-}
+};
 
 export function formatDuration(seconds, options = {}) {
   options = {
     ignoreZero: true,
     format: defaultFormat,
     separator: defaultSeparator,
-    intervals: ['day', 'hour', 'minute', 'second'],
+    intervals: ["day", "hour", "minute", "second"],
     ...options,
-  }
+  };
 
-  const {format, ignoreZero, separator, intervals} = options
+  const { format, ignoreZero, separator, intervals } = options;
 
-  const parts = duration(seconds).reverse()
+  const parts = duration(seconds).reverse();
 
   const output = parts
     .map((part, index) => {
-      return format(part, intervals[index])
+      return format(part, intervals[index]);
     })
     .filter((part, index) => {
       if (ignoreZero) {
-        return parts[index] !== 0
+        return parts[index] !== 0;
       }
-      return true
-    })
+      return part.length > 0;
+    });
 
   return output
-    .reduce((previous, current, index) => `${previous}${separator(index, output.length)}${current}`, '')
-    .trim()
+    .reduce(
+      (previous, current, index) =>
+        `${previous}${separator(index, output.length)}${current}`,
+      ""
+    )
+    .trim();
 }
 
 export function formatDurationShort(seconds, options = {}) {
   options = {
-    intervals: ['d', 'h', 'm', 's'],
-    format: (value, key) => `${['d', 'h'].includes(key) ? value : pad(value)}${key}`,
-    separator: () => ' ',
+    intervals: ["d", "h", "m", "s"],
+    format: (value, key) =>
+      `${["d", "h"].includes(key) ? value : pad(value)}${key}`,
+    separator: () => " ",
     ...options,
-  }
-  return formatDuration(seconds, options)
+  };
+  return formatDuration(seconds, options);
 }
 
 export function pluralize(count, singular, plural, returnCount) {
@@ -96,15 +102,15 @@ export function pluralize(count, singular, plural, returnCount) {
 }
 
 export function formatMinutes(minutes) {
-  let duration = minutes
-  let singular = 'minute'
-  let plural = 'minutes'
+  let duration = minutes;
+  let singular = "minute";
+  let plural = "minutes";
 
   if (duration > 60) {
-    duration = duration / 60
-    singular = 'hour'
-    plural = 'hours'
+    duration = duration / 60;
+    singular = "hour";
+    plural = "hours";
   }
 
-  return pluralize(parseInt(duration, 10), singular, plural, true)
+  return pluralize(parseInt(duration, 10), singular, plural, true);
 }
