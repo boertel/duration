@@ -57,10 +57,8 @@ export function formatDuration(seconds, options = {}) {
       return format(part, intervals[index]);
     })
     .filter((part, index) => {
-      if (ignoreZero) {
-        return parts[index] !== 0;
-      }
-      return part.length > 0;
+      let isNotZero: boolean = ignoreZero && parts[index] !== 0;
+      return isNotZero && part.length > 0;
     });
 
   return output
