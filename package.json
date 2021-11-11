@@ -1,6 +1,6 @@
 {
   "name": "@boertel/duration",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "./dist/duration.umd.js",
   "module": "./dist/duration.es.js",
   "types": "./dist/duration.d.ts",
