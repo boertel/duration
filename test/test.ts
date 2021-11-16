@@ -65,12 +65,21 @@ describe("duration format", () => {
     );
   });
 
-  it("seconds and minutes", () => {
+  it("seconds and minutes with escape strings", () => {
     const d = duration().seconds(43).minutes(12);
     assert.equal(d.format("mm:ss"), "12:43", "double digits");
     assert.equal(
-      d.format("mm MM and ss SS"),
-      "12 minutes [and] 43 seconds",
+      d.format("mm MM [and] ss SS"),
+      "12 minutes and 43 seconds",
+      "double digits with long labels"
+    );
+  });
+
+  it("escape strings that are formats", () => {
+    const d = duration().seconds(43).minutes(12);
+    assert.equal(
+      d.format("mm MM [MM] ss SS [DD]"),
+      "12 minutes MM 43 seconds DD",
       "double digits with long labels"
     );
   });
@@ -107,5 +116,27 @@ describe("duration format", () => {
   it("with an array to generate a sentence with format", () => {
     const d = duration().minutes(12).hours(20);
     assert.equal(d.format(["h HH"]), "20 hours");
+  });
+});
+
+describe("get other values", () => {
+  it("toArray", () => {
+    assert.sameOrderedMembers(duration(0).toArray(), [0, 0, 0, 0]);
+    assert.sameOrderedMembers(duration(838838).toArray(), [38, 0, 17, 9]);
+  });
+
+  it("toObject", () => {
+    assert.deepEqual(duration(0).toObject(), {
+      seconds: 0,
+      minutes: 0,
+      hours: 0,
+      days: 0,
+    });
+    assert.deepEqual(duration(838838).toObject(), {
+      seconds: 38,
+      minutes: 0,
+      hours: 17,
+      days: 9,
+    });
   });
 });

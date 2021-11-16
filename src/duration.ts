@@ -21,27 +21,23 @@ export function duration(inputInSeconds?: number): Duration {
   return new Duration(output);
 }
 
-class Duration {
+export class Duration {
   private _seconds: number = 0;
   private _minutes: number = 0;
   private _hours: number = 0;
   private _days: number = 0;
 
-  constructor(
-    args?:
-      | number[]
-      | { seconds: number; minutes: number; hours: number; days: number }
-  ) {
+  constructor(args?: number[] | DurationObject) {
     if (Array.isArray(args)) {
       this._seconds = args[3];
       this._minutes = args[2];
       this._hours = args[1];
       this._days = args[0];
     } else if (typeof args === "object") {
-      this._seconds = args.seconds;
-      this._minutes = args.minutes;
-      this._hours = args.hours;
-      this._days = args.days;
+      this._seconds = args.seconds || this._seconds;
+      this._minutes = args.minutes || this._minutes;
+      this._hours = args.hours || this._hours;
+      this._days = args.days || this._days;
     }
   }
 
@@ -67,6 +63,15 @@ class Duration {
 
   toArray(): number[] {
     return [this._seconds, this._minutes, this._hours, this._days];
+  }
+
+  toObject(): DurationObject {
+    return {
+      days: this._days,
+      hours: this._hours,
+      minutes: this._minutes,
+      seconds: this._seconds,
+    };
   }
 
   get(str: SingleFormat): number {
@@ -131,7 +136,7 @@ class Duration {
     };
 
     return str.replace(REGEX_FORMAT, (match, $1): string => {
-      return $1 || String(matches[match]);
+      return $1 || matches[match];
     });
   }
 
@@ -144,8 +149,19 @@ class Duration {
   }
 }
 
+// detect [anything] and then all matches possible
+const REGEX_FORMAT =
+  /\[([^\[]*)\]|D{1,2}|d{1,2}|H{1,2}|h{1,2}|M{1,2}|m{1,2}|S{1,2}|s{1,2}/g;
+
 interface FormatOptions {
   ignoreZero: boolean;
+}
+
+interface DurationObject {
+  seconds: number;
+  minutes: number;
+  hours: number;
+  days: number;
 }
 
 enum SingleFormat {
@@ -158,10 +174,6 @@ enum SingleFormat {
 interface FormatMatches {
   [key: string]: string;
 }
-
-// detect [anything] and then all matches possible
-const REGEX_FORMAT =
-  /\[([^\]]+)]|D{1,2}|d{1,2}|H{1,2}|h{1,2}|M{1,2}|m{1,2}|S{1,2}|s{1,2}/g;
 
 function pad(value: number): string {
   let s = String(value);
