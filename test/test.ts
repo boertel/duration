@@ -65,6 +65,14 @@ describe("duration format", () => {
     );
   });
 
+  it("with everything", () => {
+    const d = duration().days(1).hours(2).minutes(3).seconds(4);
+    assert.equal(
+      d.format("dd DD hh HH mm MM ss SS"),
+      "01 day 02 hours 03 minutes 04 seconds"
+    );
+  });
+
   it("seconds and minutes with escape strings", () => {
     const d = duration().seconds(43).minutes(12);
     assert.equal(d.format("mm:ss"), "12:43", "double digits");

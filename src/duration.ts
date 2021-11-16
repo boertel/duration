@@ -116,23 +116,33 @@ export class Duration {
   }
 
   private _format(str: string): string {
+    const locale: { [key: string]: string[] } = {
+      D: ["d"],
+      DD: ["day", "days"],
+      H: ["h"],
+      HH: ["hour", "hours"],
+      M: ["m"],
+      MM: ["minute", "minutes"],
+      S: ["s"],
+      SS: ["second", "seconds"],
+    };
     const matches: FormatMatches = {
       d: String(this._days),
       dd: pad(this._days),
-      D: "d",
-      DD: pluralize(this._days, "day", "days"),
+      D: locale.D[0],
+      DD: pluralize.apply(null, [this._days, ...locale.DD]),
       h: String(this._hours),
       hh: pad(this._hours),
-      H: "h",
-      HH: pluralize(this._hours, "hour", "hours"),
+      H: locale.H[0],
+      HH: pluralize.apply(null, [this._hours, ...locale.HH]),
       m: String(this._minutes),
       mm: pad(this._minutes),
-      M: "m",
-      MM: pluralize(this._minutes, "minute", "minutes"),
+      M: locale.M[0],
+      MM: pluralize.apply(null, [this._minutes, ...locale.MM]),
       s: String(this._seconds),
       ss: pad(this._seconds),
-      S: "s",
-      SS: pluralize(this._seconds, "second", "seconds"),
+      S: locale.S[0],
+      SS: pluralize.apply(null, [this._seconds, ...locale.SS]),
     };
 
     return str.replace(REGEX_FORMAT, (match, $1): string => {
