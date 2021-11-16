@@ -1,0 +1,13 @@
+name: Tests
+on: push
+
+jobs:
+  tests:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '15'
+      - run: npm ci
+      - run: npm test
