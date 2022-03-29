@@ -61,13 +61,18 @@ describe("create duration with chaining", () => {
 });
 
 describe("duration format", () => {
-  it.only("milliseconds", () => {
+  it("milliseconds", () => {
     assert.equal(duration(4).format("i"), "4", "single digit");
-    assert.equal(duration(4).format("iii"), "04", "double digits");
+    assert.equal(duration(4).format("iii"), "004", "triple digits");
     assert.equal(
       duration(91814).format("mm:ss.iii"),
       "01:31.814",
-      "double digits"
+      "triple digits"
+    );
+    assert.equal(
+      duration(90030).format("m:ss.iii"),
+      "1:30.030",
+      "triple digits"
     );
   });
 

@@ -166,7 +166,7 @@ export class Duration {
       S: locale.S[0],
       SS: pluralize.apply(null, [this._seconds, ...locale.SS]),
       i: String(this._milliseconds),
-      iii: pad(this._milliseconds),
+      iii: pad(this._milliseconds, 3),
       I: locale.S[0],
       II: pluralize.apply(null, [this._milliseconds, ...locale.II]),
     };
@@ -213,9 +213,9 @@ interface FormatMatches {
   [key: string]: string;
 }
 
-function pad(value: number): string {
+function pad(value: number, limit: number = 2): string {
   let s = String(value);
-  while (s.length < 2) {
+  while (s.length < limit) {
     s = "0" + s;
   }
   return s;
