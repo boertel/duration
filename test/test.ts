@@ -26,8 +26,7 @@ const tests = [
 /*
 describe("test mostly for developing/debugging", () => {
   it("only", () => {
-    console.log(duration(59).toObject());
-    assert.sameOrderedMembers(duration(1).toArray(), [0, 59, 0, 0, 0]);
+    console.log(duration(59).inMs());
   });
 });
 */
@@ -159,6 +158,11 @@ describe("duration format", () => {
 });
 
 describe("get other values", () => {
+  it("toMs", () => {
+    assert.equal(duration(45).toMs(), 45);
+    assert.equal(duration([45, 2]).toMs(), 45 + 1000 * 2);
+  });
+
   it("toArray", () => {
     assert.sameOrderedMembers(duration(0).toArray(), [0, 0, 0, 0, 0]);
     assert.sameOrderedMembers(

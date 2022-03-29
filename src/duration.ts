@@ -1,24 +1,32 @@
-export function duration(inputInMilliseconds?: number): Duration {
-  let output: number[] = [];
-  if (inputInMilliseconds === undefined) {
-    return new Duration();
-  }
-  let remainder: number = inputInMilliseconds;
-  const durations: number[] = [
-    // Number of milliseconds in
-    24 * 60 * 60 * 1000, // a day
-    60 * 60 * 1000, // a hour
-    60 * 1000, // a minute
-    1000, // a second
-  ];
-  durations.forEach((divisor: number, index: number) => {
-    const quotient: number = Math.abs(parseFloat(`${remainder / divisor}`));
-    remainder = Math.abs(remainder % divisor);
-    output.push(Math.floor(quotient));
-    if (index === durations.length - 1) {
-      output.push(Math.floor(remainder));
+const durations: number[] = [
+  // Number of milliseconds in
+  24 * 60 * 60 * 1000, // a day
+  60 * 60 * 1000, // a hour
+  60 * 1000, // a minute
+  1000, // a second
+];
+
+export function duration(input?: number | number[]): Duration {
+  let output: number[];
+  if (Array.isArray(input)) {
+    output = input;
+  } else {
+    output = [];
+    if (input === undefined) {
+      return new Duration();
     }
-  });
+    let remainder: number = input;
+
+    durations.forEach((divisor: number, index: number) => {
+      const quotient: number = Math.abs(parseFloat(`${remainder / divisor}`));
+      remainder = Math.abs(remainder % divisor);
+      output.push(Math.floor(quotient));
+      if (index === durations.length - 1) {
+        output.push(Math.floor(remainder));
+      }
+    });
+    output.reverse();
+  }
   return new Duration(output);
 }
 
@@ -33,11 +41,11 @@ export class Duration {
 
   constructor(args?: number[] | DurationObject) {
     if (Array.isArray(args)) {
-      this._milliseconds = args[4];
-      this._seconds = args[3];
-      this._minutes = args[2];
-      this._hours = args[1];
-      this._days = args[0];
+      this._milliseconds = args[0] || this._milliseconds;
+      this._seconds = args[1] || this._seconds;
+      this._minutes = args[2] || this._minutes;
+      this._hours = args[3] || this._hours;
+      this._days = args[4] || this._days;
     } else if (typeof args === "object") {
       this._milliseconds = args.milliseconds || this._milliseconds;
       this._seconds = args.seconds || this._seconds;
@@ -45,6 +53,16 @@ export class Duration {
       this._hours = args.hours || this._hours;
       this._days = args.days || this._days;
     }
+  }
+
+  toMs(): number {
+    return this.toArray().reduce(
+      (prev: number, curr: number, index: number) => {
+        const multiplier = durations[durations.length - index] || 1;
+        return prev + multiplier * curr;
+      },
+      0
+    );
   }
 
   milliseconds(inputInMilliseconds: number): Duration {
