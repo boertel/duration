@@ -1,17 +1,18 @@
-export function duration(inputInSeconds?: number): Duration {
+export function duration(inputInMilliseconds?: number): Duration {
   let output: number[] = [];
-  if (inputInSeconds === undefined) {
+  if (inputInMilliseconds === undefined) {
     return new Duration();
   }
-  let remainder: number = inputInSeconds;
+  let remainder: number = inputInMilliseconds;
   const durations: number[] = [
-    // Number of seconds in
-    24 * 60 * 60, // a day
-    60 * 60, // a hour
-    1 * 60, // a minute
+    // Number of milliseconds in
+    24 * 60 * 60 * 1000, // a day
+    60 * 60 * 1000, // a hour
+    60 * 1000, // a minute
+    1000, // a second
   ];
   durations.forEach((divisor: number, index: number) => {
-    const quotient: number = Math.abs(parseInt(`${remainder / divisor}`, 10));
+    const quotient: number = Math.abs(parseFloat(`${remainder / divisor}`));
     remainder = Math.abs(remainder % divisor);
     output.push(Math.floor(quotient));
     if (index === durations.length - 1) {
@@ -21,7 +22,10 @@ export function duration(inputInSeconds?: number): Duration {
   return new Duration(output);
 }
 
+// const next = Tomorrow | Thrusday | Friday | Saturday | Sunday | Next Monday | Next Week | Week after next | in 2 weeks | in 3 weeks | next months | in 2 months |
+
 export class Duration {
+  private _milliseconds: number = 0;
   private _seconds: number = 0;
   private _minutes: number = 0;
   private _hours: number = 0;
@@ -29,16 +33,23 @@ export class Duration {
 
   constructor(args?: number[] | DurationObject) {
     if (Array.isArray(args)) {
+      this._milliseconds = args[4];
       this._seconds = args[3];
       this._minutes = args[2];
       this._hours = args[1];
       this._days = args[0];
     } else if (typeof args === "object") {
+      this._milliseconds = args.milliseconds || this._milliseconds;
       this._seconds = args.seconds || this._seconds;
       this._minutes = args.minutes || this._minutes;
       this._hours = args.hours || this._hours;
       this._days = args.days || this._days;
     }
+  }
+
+  milliseconds(inputInMilliseconds: number): Duration {
+    this._milliseconds = inputInMilliseconds;
+    return this;
   }
 
   seconds(inputInSeconds: number): Duration {
@@ -62,7 +73,13 @@ export class Duration {
   }
 
   toArray(): number[] {
-    return [this._seconds, this._minutes, this._hours, this._days];
+    return [
+      this._milliseconds,
+      this._seconds,
+      this._minutes,
+      this._hours,
+      this._days,
+    ];
   }
 
   toObject(): DurationObject {
@@ -71,6 +88,7 @@ export class Duration {
       hours: this._hours,
       minutes: this._minutes,
       seconds: this._seconds,
+      milliseconds: this._milliseconds,
     };
   }
 
@@ -85,6 +103,8 @@ export class Duration {
         return this._minutes;
       case "s":
         return this._seconds;
+      case "i":
+        return this._milliseconds;
       default:
         throw new Error("Invalid format");
     }
@@ -125,6 +145,8 @@ export class Duration {
       MM: ["minute", "minutes"],
       S: ["s"],
       SS: ["second", "seconds"],
+      I: ["ms"],
+      II: ["millisecond", "milliseconds"],
     };
     const matches: FormatMatches = {
       d: String(this._days),
@@ -143,6 +165,10 @@ export class Duration {
       ss: pad(this._seconds),
       S: locale.S[0],
       SS: pluralize.apply(null, [this._seconds, ...locale.SS]),
+      i: String(this._milliseconds),
+      iii: pad(this._milliseconds),
+      I: locale.S[0],
+      II: pluralize.apply(null, [this._milliseconds, ...locale.II]),
     };
 
     return str.replace(REGEX_FORMAT, (match, $1): string => {
@@ -161,13 +187,14 @@ export class Duration {
 
 // detect [anything] and then all matches possible
 const REGEX_FORMAT =
-  /\[([^\[]*)\]|D{1,2}|d{1,2}|H{1,2}|h{1,2}|M{1,2}|m{1,2}|S{1,2}|s{1,2}/g;
+  /\[([^\[]*)\]|D{1,2}|d{1,2}|H{1,2}|h{1,2}|M{1,2}|m{1,2}|S{1,2}|s{1,2}|I{1,2}|i{1,3}/g;
 
 interface FormatOptions {
   ignoreZero: boolean;
 }
 
 interface DurationObject {
+  milliseconds: number;
   seconds: number;
   minutes: number;
   hours: number;
@@ -179,6 +206,7 @@ enum SingleFormat {
   h = "h",
   m = "m",
   s = "s",
+  i = "ms",
 }
 
 interface FormatMatches {

@@ -3,63 +3,89 @@ import { assert } from "chai";
 import { duration } from "../src/duration";
 
 const tests = [
-  { seconds: 0, expected: [0, 0, 0, 0] },
-  { seconds: 59, expected: [59, 0, 0, 0] },
-  { seconds: 60, expected: [0, 1, 0, 0] },
-  { seconds: 65, expected: [5, 1, 0, 0] },
-  { seconds: 120, expected: [0, 2, 0, 0] },
-  { seconds: 60 * 60, expected: [0, 0, 1, 0], message: "1 hour" },
-  { seconds: 24 * 60 * 60, expected: [0, 0, 0, 1], message: "1 day" },
-  { seconds: 5 * 24 * 60 * 60, expected: [0, 0, 0, 5], message: "5 days" },
+  { seconds: 0, expected: [0, 0, 0, 0, 0] },
+  { seconds: 59, expected: [0, 59, 0, 0, 0] },
+  { seconds: 60, expected: [0, 0, 1, 0, 0] },
+  { seconds: 65, expected: [0, 5, 1, 0, 0] },
+  { seconds: 120, expected: [0, 0, 2, 0, 0] },
+  { seconds: 60 * 60, expected: [0, 0, 0, 1, 0], message: "1 hour" },
+  { seconds: 24 * 60 * 60, expected: [0, 0, 0, 0, 1], message: "1 day" },
+  { seconds: 5 * 24 * 60 * 60, expected: [0, 0, 0, 0, 5], message: "5 days" },
   {
     seconds: 24 * 60 * 60 + 60 * 60 * 14 + 60 * 3 + 12,
-    expected: [12, 3, 14, 1],
+    expected: [0, 12, 3, 14, 1],
     message: "1 day, 14 hours, 3 minutes and 12 seconds",
   },
   {
     seconds: 370 * 24 * 60 * 60,
-    expected: [0, 0, 0, 370],
+    expected: [0, 0, 0, 0, 370],
     message: "370 days",
   },
 ];
 
+/*
+describe("test mostly for developing/debugging", () => {
+  it("only", () => {
+    console.log(duration(59).toObject());
+    assert.sameOrderedMembers(duration(1).toArray(), [0, 59, 0, 0, 0]);
+  });
+});
+*/
+
 describe("duration function", () => {
   tests.forEach(({ seconds, expected, message }) => {
     it(`${seconds} seconds ${message ? `= ${message}` : ""}`, () => {
-      assert.sameOrderedMembers(duration(seconds).toArray(), expected, message);
+      assert.sameOrderedMembers(
+        duration(seconds * 1000).toArray(),
+        expected,
+        message
+      );
     });
   });
 });
 
 describe("create duration with chaining", () => {
   it("create seconds", () => {
-    assert.sameOrderedMembers(duration().seconds(20).toArray(), [20, 0, 0, 0]);
+    assert.sameOrderedMembers(
+      duration().seconds(20).toArray(),
+      [0, 20, 0, 0, 0]
+    );
   });
 
   it("create seconds, minutes and hours", () => {
     assert.sameOrderedMembers(
       duration().seconds(20).minutes(23).hours(40).toArray(),
-      [20, 23, 40, 0]
+      [0, 20, 23, 40, 0]
     );
   });
 });
 
 describe("duration format", () => {
-  it("seconds", () => {
-    assert.equal(duration(1).format("s"), "1", "single digit");
-    assert.equal(duration(1).format("ss"), "01", "double digits");
+  it.only("milliseconds", () => {
+    assert.equal(duration(4).format("i"), "4", "single digit");
+    assert.equal(duration(4).format("iii"), "04", "double digits");
     assert.equal(
-      duration(1).format("s SS"),
+      duration(91814).format("mm:ss.iii"),
+      "01:31.814",
+      "double digits"
+    );
+  });
+
+  it("seconds", () => {
+    assert.equal(duration(1000).format("s"), "1", "single digit");
+    assert.equal(duration(1000).format("ss"), "01", "double digits");
+    assert.equal(
+      duration(1000).format("s SS"),
       "1 second",
       "single digit with long label"
     );
     assert.equal(
-      duration(1).format("ss SS"),
+      duration(1000).format("ss SS"),
       "01 second",
       "double digits with long label"
     );
     assert.equal(
-      duration(1).format("sS"),
+      duration(1000).format("sS"),
       "1s",
       "single digit with short label"
     );
@@ -129,18 +155,23 @@ describe("duration format", () => {
 
 describe("get other values", () => {
   it("toArray", () => {
-    assert.sameOrderedMembers(duration(0).toArray(), [0, 0, 0, 0]);
-    assert.sameOrderedMembers(duration(838838).toArray(), [38, 0, 17, 9]);
+    assert.sameOrderedMembers(duration(0).toArray(), [0, 0, 0, 0, 0]);
+    assert.sameOrderedMembers(
+      duration(838838 * 1000).toArray(),
+      [0, 38, 0, 17, 9]
+    );
   });
 
   it("toObject", () => {
     assert.deepEqual(duration(0).toObject(), {
+      milliseconds: 0,
       seconds: 0,
       minutes: 0,
       hours: 0,
       days: 0,
     });
-    assert.deepEqual(duration(838838).toObject(), {
+    assert.deepEqual(duration(838838 * 1000).toObject(), {
+      milliseconds: 0,
       seconds: 38,
       minutes: 0,
       hours: 17,
