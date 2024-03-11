@@ -2,7 +2,7 @@ import "mocha";
 import { assert } from "chai";
 import { duration } from "../src/duration";
 
-const tests = [
+const fromNumber = [
   { seconds: 0, expected: [0, 0, 0, 0, 0] },
   { seconds: 59, expected: [0, 59, 0, 0, 0] },
   { seconds: 60, expected: [0, 0, 1, 0, 0] },
@@ -25,20 +25,48 @@ const tests = [
 
 /*
 describe("test mostly for developing/debugging", () => {
-  it("only", () => {
-    console.log(duration(59).inMs());
+  it.only("only", () => {
   });
 });
 */
 
 describe("duration function", () => {
-  tests.forEach(({ seconds, expected, message }) => {
+  fromNumber.forEach(({ seconds, expected, message }) => {
     it(`${seconds} seconds ${message ? `= ${message}` : ""}`, () => {
       assert.sameOrderedMembers(
         duration(seconds * 1000).toArray(),
         expected,
-        message
+        message,
       );
+    });
+  });
+});
+
+const fromString = [
+  {
+    str: "1:29.659",
+    format: "m:ss.iii",
+    expected: 1 * 60 * 1000 + 29 * 1000 + 659,
+  },
+  {
+    str: "05:29.310",
+    format: "mm:ss.iii",
+    expected: 5 * 60 * 1000 + 29 * 1000 + 310,
+  },
+  {
+    str: "12:45.010",
+    format: "m:ss.iii",
+    expected: 12 * 60 * 1000 + 45 * 1000 + 10,
+  },
+  // TODO right failure:
+  // - wrong format
+  // - wrong text
+];
+
+describe("duration.parse function", () => {
+  fromString.forEach(({ str, format, expected }) => {
+    it(`${str} with ${format} = ${expected}`, () => {
+      assert.equal(duration.parse(str, format), expected);
     });
   });
 });
@@ -47,14 +75,14 @@ describe("create duration with chaining", () => {
   it("create seconds", () => {
     assert.sameOrderedMembers(
       duration().seconds(20).toArray(),
-      [0, 20, 0, 0, 0]
+      [0, 20, 0, 0, 0],
     );
   });
 
   it("create seconds, minutes and hours", () => {
     assert.sameOrderedMembers(
       duration().seconds(20).minutes(23).hours(40).toArray(),
-      [0, 20, 23, 40, 0]
+      [0, 20, 23, 40, 0],
     );
   });
 });
@@ -66,12 +94,12 @@ describe("duration format", () => {
     assert.equal(
       duration(91814).format("mm:ss.iii"),
       "01:31.814",
-      "triple digits"
+      "triple digits",
     );
     assert.equal(
       duration(90030).format("m:ss.iii"),
       "1:30.030",
-      "triple digits"
+      "triple digits",
     );
   });
 
@@ -81,17 +109,17 @@ describe("duration format", () => {
     assert.equal(
       duration(1000).format("s SS"),
       "1 second",
-      "single digit with long label"
+      "single digit with long label",
     );
     assert.equal(
       duration(1000).format("ss SS"),
       "01 second",
-      "double digits with long label"
+      "double digits with long label",
     );
     assert.equal(
       duration(1000).format("sS"),
       "1s",
-      "single digit with short label"
+      "single digit with short label",
     );
   });
 
@@ -99,7 +127,7 @@ describe("duration format", () => {
     const d = duration().days(1).hours(2).minutes(3).seconds(4);
     assert.equal(
       d.format("dd DD hh HH mm MM ss SS"),
-      "01 day 02 hours 03 minutes 04 seconds"
+      "01 day 02 hours 03 minutes 04 seconds",
     );
   });
 
@@ -109,7 +137,7 @@ describe("duration format", () => {
     assert.equal(
       d.format("mm MM [and] ss SS"),
       "12 minutes and 43 seconds",
-      "double digits with long labels"
+      "double digits with long labels",
     );
   });
 
@@ -118,7 +146,7 @@ describe("duration format", () => {
     assert.equal(
       d.format("mm MM [MM] ss SS [DD]"),
       "12 minutes MM 43 seconds DD",
-      "double digits with long labels"
+      "double digits with long labels",
     );
   });
 
@@ -126,7 +154,7 @@ describe("duration format", () => {
     const d = duration().seconds(23).minutes(21).hours(2);
     assert.equal(
       d.format(["d DD", "h HH", "m MM", "s SS"]),
-      "2 hours, 21 minutes and 23 seconds"
+      "2 hours, 21 minutes and 23 seconds",
     );
   });
 
@@ -134,7 +162,7 @@ describe("duration format", () => {
     const d = duration().seconds(23).minutes(21).hours(2).days(18);
     assert.equal(
       d.format(["d DD", "h HH", "m MM", "s SS"]),
-      "18 days, 2 hours, 21 minutes and 23 seconds"
+      "18 days, 2 hours, 21 minutes and 23 seconds",
     );
   });
 
@@ -142,7 +170,7 @@ describe("duration format", () => {
     const d = duration().seconds(23).minutes(0).hours(0).days(18);
     assert.equal(
       d.format(["d DD", "h HH", "m MM", "s SS"]),
-      "18 days and 23 seconds"
+      "18 days and 23 seconds",
     );
   });
 
@@ -167,7 +195,7 @@ describe("get other values", () => {
     assert.sameOrderedMembers(duration(0).toArray(), [0, 0, 0, 0, 0]);
     assert.sameOrderedMembers(
       duration(838838 * 1000).toArray(),
-      [0, 38, 0, 17, 9]
+      [0, 38, 0, 17, 9],
     );
   });
 
