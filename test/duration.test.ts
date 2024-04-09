@@ -1,5 +1,4 @@
-import "mocha";
-import { assert } from "chai";
+import { describe, it, assert } from "vitest";
 import { duration } from "../src/duration";
 
 const fromNumber = [
@@ -23,12 +22,13 @@ const fromNumber = [
   },
 ];
 
-/*
 describe("test mostly for developing/debugging", () => {
   it.only("only", () => {
+    console.log(
+      duration(0 * 60 * 1000 + 0 * 1000 + 450 * 1).format("m?:ss.iii"),
+    );
   });
 });
-*/
 
 describe("duration function", () => {
   fromNumber.forEach(({ seconds, expected, message }) => {
@@ -58,15 +58,23 @@ const fromString = [
     format: "m:ss.iii",
     expected: 12 * 60 * 1000 + 45 * 1000 + 10,
   },
-  // TODO right failure:
-  // - wrong format
-  // - wrong text
+  {
+    str: "–",
+    format: "m:ss.iii",
+    thrown: "Invalid format: – does not match m:ss.iii",
+  },
 ];
 
 describe("duration.parse function", () => {
-  fromString.forEach(({ str, format, expected }) => {
-    it(`${str} with ${format} = ${expected}`, () => {
-      assert.equal(duration.parse(str, format), expected);
+  fromString.forEach(({ str, format, expected, thrown }) => {
+    it(`${str} with ${format} = ${expected || `throw exception: "${thrown}"`}`, () => {
+      if (thrown) {
+        assert.throws(() => {
+          duration.parse(str, format);
+        }, thrown);
+      } else {
+        assert.equal(duration.parse(str, format).toMs(), expected);
+      }
     });
   });
 });

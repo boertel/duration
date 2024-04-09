@@ -30,9 +30,8 @@ export function duration(input?: number | number[]): Duration {
   return new Duration(output);
 }
 
-duration.parse = function (text: string, format: string): number {
+duration.parse = function (text: string, format: string): Duration {
   let parts: string[] = format.match(REGEX_FORMAT);
-  let value = 0;
   // TODO can we infer this from something else in this file?
   const multipliers: { [key: string]: number } = {
     d: 0,
@@ -72,7 +71,11 @@ duration.parse = function (text: string, format: string): number {
 
   const regex = new RegExp(strRegex);
   const matches = text.match(regex);
+  if (matches === null) {
+    throw new Error(`Invalid format: ${text} does not match ${format}`);
+  }
 
+  let ms = 0;
   parts.forEach((part, index) => {
     // FIXME by adding * 1 to `durations` it breaks other tests
     // defaulting to 1 is probably wrong
@@ -81,9 +84,9 @@ duration.parse = function (text: string, format: string): number {
     if (isNaN(n)) {
       throw new Error(`Invalid format: ${text} does not match ${format}`);
     }
-    value += n * multiplier;
+    ms += n * multiplier;
   });
-  return value;
+  return duration(ms);
 };
 
 // const next = Tomorrow | Thrusday | Friday | Saturday | Sunday | Next Monday | Next Week | Week after next | in 2 weeks | in 3 weeks | next months | in 2 months |
@@ -246,6 +249,7 @@ export class Duration {
     };
 
     return str.replace(REGEX_FORMAT, (match, $1): string => {
+      console.log(match, matches[match]);
       return $1 || matches[match];
     });
   }

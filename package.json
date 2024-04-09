@@ -5,20 +5,16 @@
   "module": "./dist/duration.es.js",
   "types": "./dist/duration.d.ts",
   "devDependencies": {
-    "@types/chai": "^4.2.22",
-    "@types/mocha": "^9.0.0",
-    "@types/node": "^16.11.7",
-    "chai": "^4.3.4",
     "estrella": "^1.4.1",
-    "mocha": "^9.1.3",
     "ts-node": "^10.4.0",
-    "typescript": "^4.1.3"
+    "typescript": "^4.1.3",
+    "vitest": "^1.3.1"
   },
   "scripts": {
     "start": "npm run dev",
     "dev": "./build.js -debug -watch -inline-sourcemap",
     "build": "./build.js",
-    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'test/**/*.ts'",
+    "test": "vitest",
     "prepublishOnly": "npm run build"
   },
   "repository": {
