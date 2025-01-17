@@ -30,6 +30,65 @@ export function duration(input?: number | number[]): Duration {
   return new Duration(output);
 }
 
+duration.parse = function (text: string, format: string): Duration {
+  let parts: string[] = format.match(REGEX_FORMAT);
+  // TODO can we infer this from something else in this file?
+  const multipliers: { [key: string]: number } = {
+    d: 0,
+    dd: 0,
+    h: 1,
+    hh: 1,
+    m: 2,
+    mm: 2,
+    s: 3,
+    ss: 3,
+    i: 4,
+    iii: 4,
+  };
+
+  // TODO can we generate REGEX_FORMAT instead from this?
+  // REGEX_PARTS.d | REGEX_PARTS.dd | REGEX_PARTS.h | REGEX_PARTS.hh | ...
+  const regexParts = {
+    d: /(\d{1,2})/,
+    dd: /(\d{2})/,
+    h: /(\d{1,2})/,
+    hh: /(\d{2})/,
+    m: /(\d{1,2})/,
+    mm: /(\d{2})/,
+    s: /(\d{1,2})/,
+    ss: /(\d{2})/,
+    i: /(\d{1,3})/,
+    iii: /(\d{3})/,
+  };
+
+  // generate a regex to match the format
+  // so we can extract values from text
+  let strRegex: string = "";
+  parts.forEach((part) => {
+    strRegex += regexParts[part].source;
+    strRegex += /\D?/.source;
+  });
+
+  const regex = new RegExp(strRegex);
+  const matches = text.match(regex);
+  if (matches === null) {
+    throw new Error(`Invalid format: ${text} does not match ${format}`);
+  }
+
+  let ms = 0;
+  parts.forEach((part, index) => {
+    // FIXME by adding * 1 to `durations` it breaks other tests
+    // defaulting to 1 is probably wrong
+    const multiplier = durations[multipliers[part]] || 1;
+    const n = Number(matches[index + 1]);
+    if (isNaN(n)) {
+      throw new Error(`Invalid format: ${text} does not match ${format}`);
+    }
+    ms += n * multiplier;
+  });
+  return duration(ms);
+};
+
 // const next = Tomorrow | Thrusday | Friday | Saturday | Sunday | Next Monday | Next Week | Week after next | in 2 weeks | in 3 weeks | next months | in 2 months |
 
 export class Duration {
@@ -61,7 +120,7 @@ export class Duration {
         const multiplier = durations[durations.length - index] || 1;
         return prev + multiplier * curr;
       },
-      0
+      0,
     );
   }
 
@@ -110,7 +169,7 @@ export class Duration {
     };
   }
 
-  get(str: SingleFormat): number {
+  get(str: "d" | "h" | "m" | "s" | "i"): number {
     const caseInsensitive = str.toLowerCase();
     switch (caseInsensitive) {
       case "d":
@@ -217,14 +276,6 @@ interface DurationObject {
   minutes: number;
   hours: number;
   days: number;
-}
-
-enum SingleFormat {
-  d = "d",
-  h = "h",
-  m = "m",
-  s = "s",
-  i = "ms",
 }
 
 interface FormatMatches {
