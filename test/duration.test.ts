@@ -25,7 +25,8 @@ const fromNumber = [
 describe("test mostly for developing/debugging", () => {
   it.only("only", () => {
     console.log(
-      duration(0 * 60 * 1000 + 0 * 1000 + 450 * 1).format("m?:ss.iii"),
+      //duration(0 * 60 * 1000 + 0 * 1000 + 450 * 1).format("m?:ss.iii"),
+      duration(-1871).toArray(),
     );
   });
 });

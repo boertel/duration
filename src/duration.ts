@@ -169,7 +169,7 @@ export class Duration {
     };
   }
 
-  get(str: SingleFormat): number {
+  get(str: "d" | "h" | "m" | "s" | "i"): number {
     const caseInsensitive = str.toLowerCase();
     switch (caseInsensitive) {
       case "d":
@@ -249,7 +249,6 @@ export class Duration {
     };
 
     return str.replace(REGEX_FORMAT, (match, $1): string => {
-      console.log(match, matches[match]);
       return $1 || matches[match];
     });
   }
@@ -277,14 +276,6 @@ interface DurationObject {
   minutes: number;
   hours: number;
   days: number;
-}
-
-enum SingleFormat {
-  d = "d",
-  h = "h",
-  m = "m",
-  s = "s",
-  i = "ms",
 }
 
 interface FormatMatches {
