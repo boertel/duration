@@ -61,7 +61,7 @@ export class Duration {
         const multiplier = durations[durations.length - index] || 1;
         return prev + multiplier * curr;
       },
-      0
+      0,
     );
   }
 
@@ -170,23 +170,43 @@ export class Duration {
       d: String(this._days),
       dd: pad(this._days),
       D: locale.D[0],
-      DD: pluralize.apply(null, [this._days, ...locale.DD]),
+      DD: pluralize.apply(null, [this._days, ...locale.DD] as [
+        number,
+        string,
+        string,
+      ]),
       h: String(this._hours),
       hh: pad(this._hours),
       H: locale.H[0],
-      HH: pluralize.apply(null, [this._hours, ...locale.HH]),
+      HH: pluralize.apply(null, [this._hours, ...locale.HH] as [
+        number,
+        string,
+        string,
+      ]),
       m: String(this._minutes),
       mm: pad(this._minutes),
       M: locale.M[0],
-      MM: pluralize.apply(null, [this._minutes, ...locale.MM]),
+      MM: pluralize.apply(null, [this._minutes, ...locale.MM] as [
+        number,
+        string,
+        string,
+      ]),
       s: String(this._seconds),
       ss: pad(this._seconds),
       S: locale.S[0],
-      SS: pluralize.apply(null, [this._seconds, ...locale.SS]),
+      SS: pluralize.apply(null, [this._seconds, ...locale.SS] as [
+        number,
+        string,
+        string,
+      ]),
       i: String(this._milliseconds),
       iii: pad(this._milliseconds, 3),
       I: locale.S[0],
-      II: pluralize.apply(null, [this._milliseconds, ...locale.II]),
+      II: pluralize.apply(null, [this._milliseconds, ...locale.II] as [
+        number,
+        string,
+        string,
+      ]),
     };
 
     return str.replace(REGEX_FORMAT, (match, $1): string => {
